@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.demo.MainActivity">
+
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="click me!" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/btn">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <SeekBar
+                android:id="@+id/seekBar0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_0" />
+
+            <Button
+                android:id="@+id/button_enqueue_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_0" />
+
+            <SeekBar
+                android:id="@+id/seekBar1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_1" />
+
+            <Button
+                android:id="@+id/button_enqueue_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_1" />
+
+            <SeekBar
+                android:id="@+id/seekBar2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_2" />
+
+            <Button
+                android:id="@+id/button_enqueue_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_2" />
+
+            <SeekBar
+                android:id="@+id/seekBar3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_3" />
+
+            <Button
+                android:id="@+id/button_enqueue_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_3" />
+
+            <SeekBar
+                android:id="@+id/seekBar4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_4" />
+
+            <Button
+                android:id="@+id/button_enqueue_4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_4" />
+
+            <SeekBar
+                android:id="@+id/seekBar5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_5" />
+
+            <Button
+                android:id="@+id/button_enqueue_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_5" />
+
+            <SeekBar
+                android:id="@+id/seekBar6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_6" />
+
+            <Button
+                android:id="@+id/button_enqueue_6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_6" />
+
+            <SeekBar
+                android:id="@+id/seekBar7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_7" />
+
+            <Button
+                android:id="@+id/button_enqueue_7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_7" />
+
+            <SeekBar
+                android:id="@+id/seekBar8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_8" />
+
+            <Button
+                android:id="@+id/button_enqueue_8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_8" />
+
+            <SeekBar
+                android:id="@+id/seekBar9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_9" />
+
+            <Button
+                android:id="@+id/button_enqueue_9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_9" />
+
+            <SeekBar
+                android:id="@+id/seekBar10"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_10" />
+
+            <Button
+                android:id="@+id/button_enqueue_10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_10" />
+
+            <SeekBar
+                android:id="@+id/seekBar11"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_11" />
+
+            <Button
+                android:id="@+id/button_enqueue_11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_11" />
+
+            <SeekBar
+                android:id="@+id/seekBar12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_12" />
+
+            <Button
+                android:id="@+id/button_enqueue_12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_12" />
+
+            <SeekBar
+                android:id="@+id/seekBar13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_13" />
+
+            <Button
+                android:id="@+id/button_enqueue_13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_13" />
+
+            <SeekBar
+                android:id="@+id/seekBar14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_14" />
+
+            <Button
+                android:id="@+id/button_enqueue_14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_14" />
+
+            <SeekBar
+                android:id="@+id/seekBar15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_15" />
+
+            <Button
+                android:id="@+id/button_enqueue_15"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_15" />
+
+            <SeekBar
+                android:id="@+id/seekBar16"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_16" />
+
+            <Button
+                android:id="@+id/button_enqueue_16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_16" />
+
+            <SeekBar
+                android:id="@+id/seekBar17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/button_pause_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_pause_17" />
+
+            <Button
+                android:id="@+id/button_enqueue_17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="button_enqueue_17" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/button222"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Button" />
+
+    <Button
+        android:id="@+id/button333"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="Button" />
+
+</RelativeLayout>
