@@ -1,7 +1,10 @@
-package com.example.demo.download;
+package com.chazuo.college.enterprise.download;
 
-import com.example.demo.db.CRUDImpl;
-import com.example.demo.db.ICRUD;
+import android.text.TextUtils;
+
+import com.chazuo.czlib.module.impl.CZController;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -10,58 +13,60 @@ import java.util.List;
  */
 
 public class DBClientImpl extends DBClient {
-    private ICRUD crud;
-    public DBClientImpl(){
-        crud=new CRUDImpl();
-    }
 
     @Override
     public void taskSaveNewOnly(DBTask task) {
-        List<DBTask> findTask = taskFind("name=? and netUrl=?", new String[]{task.getName(), task.getNetUrl()});
-        if (findTask.size()==0||findTask == null)
-            crud.save(task);
+        if (!TextUtils.isEmpty(task.getName()) && !TextUtils.isEmpty(task.getNetUrl())) {
+            List<DBTask> findTask = taskFind("name=? and netUrl=?", new String[]{task.getName(), task.getNetUrl()});
+            if (findTask.size() == 0 || findTask == null) {
+                CZController.dbHelp.save(task);
+            }else if(findTask.size()>=1){
+                taskUpdate(task);
+            }
+        } else {
+            CZController.uiHelp.toast("save fail!");
+        }
     }
 
     @Override
     public void taskUpdate(DBTask task) {
         String[] whereArgs = {task.getName(), task.getNetUrl()};
-        crud.update(task, "name=? and netUrl=?", whereArgs);
+        CZController.dbHelp.update(task, "name=? and netUrl=?", whereArgs);
     }
 
     @Override
     public void taskDelete(DBTask task) {
-        String where="name=? and netUrl=? ";
-        String[]whereArgs={task.getName(),task.getNetUrl()};
-        crud.delete(DBTask.class,where,whereArgs);
+        String where = "name=? and netUrl=? ";
+        String[] whereArgs = {task.getName(), task.getNetUrl()};
+        CZController.dbHelp.delete(DBTask.class, where, whereArgs);
     }
 
     @Override
     public List<DBTask> taskFind(String where, String[] whereArgs) {
-        List<DBTask> findTask =  crud.find(DBTask.class, where, whereArgs);
+        List<DBTask> findTask = CZController.dbHelp.find(DBTask.class, where, whereArgs);
         return findTask;
     }
 
     @Override
     public List<DBTaskPoint> taskPointFind(String where, String[] whereArgs) {
-        List<DBTaskPoint> findTaskPoint =  crud.find(DBTaskPoint.class, where, whereArgs);
+        List<DBTaskPoint> findTaskPoint = CZController.dbHelp.find(DBTaskPoint.class, where, whereArgs);
         return findTaskPoint;
     }
 
 
-
     @Override
     public void taskPointSave(DBTaskPoint point) {
-        crud.save(point);
+        CZController.dbHelp.save(point);
     }
 
     @Override
     public void taskPointUpdate(DBTaskPoint point) {
         String[] whereArgs = {point.getName()};
-        crud.update(point, "name=?", whereArgs);
+        CZController.dbHelp.update(point, "name=?", whereArgs);
     }
 
     @Override
     public void taskPointDelete(String where, String[] whereArgs) {
-        crud.delete(DBTaskPoint.class, where, whereArgs);
+        CZController.dbHelp.delete(DBTaskPoint.class, where, whereArgs);
     }
 }

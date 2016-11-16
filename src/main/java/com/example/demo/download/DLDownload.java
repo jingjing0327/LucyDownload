@@ -1,10 +1,6 @@
-package com.example.demo.download;
+package com.chazuo.college.enterprise.download;
 
 import android.util.Log;
-
-import com.example.demo.db.CRUDImpl;
-import com.example.demo.db.DBUtils;
-import com.example.demo.db.ICRUD;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,11 +39,11 @@ public class DLDownload extends DLCall {
         try {
             Log.e("liqiong", "name-->>" + task.getBuilder().getName() + "--startPoint--" + startPoint + "--endPoint--" + endPoint);
             Log.e("liqiong",task.getBuilder().getTaskType().toString());
-            if(task.getBuilder().getTaskType()==DLTask.Builder.DTaskType.FINISH)
+            if(task.getBuilder().getTaskType()==DLTaskType.SUCCESS)
                 return;
             InputStream is = client.bodyInputStream(task.getBuilder().getNetUrl(), startPoint, endPoint);
             if (is == null) {
-                task.getBuilder().setTaskType(DLTask.Builder.DTaskType.FAIL);
+                task.getBuilder().setTaskType(DLTaskType.FAIL);
                 return;
             }
             RandomAccessFile file = new RandomAccessFile(task.getBuilder().getLocalUrl() + "/" + task.getBuilder().getName(), "rwd");
@@ -71,20 +67,19 @@ public class DLDownload extends DLCall {
             buffer.clone();
             //如果字节数相等，说明下载完成
             if (task.getBuilder().getLength() == task.getBuilder().getCurrentLength()) {
-                task.getBuilder().setTaskType(DLTask.Builder.DTaskType.FINISH);
+                task.getBuilder().setTaskType(DLTaskType.SUCCESS);
                 String[] whereArgs = new String[]{task.getBuilder().getNetUrl(), task.getBuilder().getName() + "%"};
                 dbClient.taskPointDelete("netUrl=? and name like ?", whereArgs);
 
                 DBTask dbTask = new DBTask();
                 dbTask.setName(task.getBuilder().getName());
                 dbTask.setNetUrl(task.getBuilder().getNetUrl());
-                dbTask.setType(1);
+                dbTask.setType(DLTaskType.SUCCESS.ordinal());
                 dbClient.taskUpdate(dbTask);
-
             }
         } catch (IOException e) {
             e.printStackTrace();
-            task.getBuilder().setTaskType(DLTask.Builder.DTaskType.FAIL);
+            task.getBuilder().setTaskType(DLTaskType.FAIL);
         }
     }
 }

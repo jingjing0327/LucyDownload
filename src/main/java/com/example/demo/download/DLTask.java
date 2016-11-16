@@ -1,4 +1,4 @@
-package com.example.demo.download;
+package com.chazuo.college.enterprise.download;
 
 import android.os.Environment;
 
@@ -23,7 +23,7 @@ public class DLTask {
         private String name;
         private String netUrl;
         private String localUrl;
-        private DTaskType taskType = DTaskType.WAIT;
+        private DLTaskType taskType = DLTaskType.WAIT;
         private long length;
         private long currentLength;
         private DLDispatcher dispatcher;
@@ -32,7 +32,9 @@ public class DLTask {
         public Builder() {
             if (Environment.getExternalStorageDirectory() != null) {
                 //默认的下载目录
-                this.localUrl = CZKernel.getInstance().getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getPath();
+                this.localUrl = CZKernel.getInstance().getContext()
+                        .getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS+"/media")
+                        .getPath();
             }
         }
 
@@ -83,11 +85,11 @@ public class DLTask {
             this.currentLength = currentLength;
         }
 
-        public DTaskType getTaskType() {
+        public DLTaskType getTaskType() {
             return taskType;
         }
 
-        public void setTaskType(DTaskType taskType) {
+        public void setTaskType(DLTaskType taskType) {
             this.taskType = taskType;
         }
 
@@ -107,12 +109,5 @@ public class DLTask {
             this.tag = tag;
         }
 
-        public enum DTaskType {
-            DOWNLOADING,
-            WAIT,
-            PAUSE,
-            FAIL,
-            FINISH
-        }
     }
 }

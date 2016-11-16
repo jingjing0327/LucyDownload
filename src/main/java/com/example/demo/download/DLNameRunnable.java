@@ -1,4 +1,4 @@
-package com.example.demo.download;
+package com.chazuo.college.enterprise.download;
 
 /**
  * Created by LiQiong on 2016/10/26.

@@ -1,10 +1,8 @@
-package com.example.demo.download;
+package com.chazuo.college.enterprise.download;
 
 import android.util.Log;
 
 import com.chazuo.czlib.module.impl.CZController;
-import com.example.demo.db.CRUDImpl;
-import com.example.demo.db.ICRUD;
 
 import java.util.List;
 import java.util.UUID;
@@ -48,6 +46,20 @@ public final class DLManage {
                 if (dbTaskPoint.getStartPoint() < dbTaskPoint.getEndPoint())
                     dispatcher.enqueue(new DLDownload(client, task, dbTaskPoint, dbTaskPoint.getStartPoint(), dbTaskPoint.getEndPoint()));
             }
+
+            //如果字段相等.,一般并不會走到走到這個代碼。
+            if (task.getBuilder().getLength() == task.getBuilder().getCurrentLength()) {
+                task.getBuilder().setTaskType(DLTaskType.SUCCESS);
+                String[] whereArgs = new String[]{task.getBuilder().getNetUrl(), task.getBuilder().getName() + "%"};
+                dbClient.taskPointDelete("netUrl=? and name like ?", whereArgs);
+
+                DBTask dbTask = new DBTask();
+                dbTask.setName(task.getBuilder().getName());
+                dbTask.setNetUrl(task.getBuilder().getNetUrl());
+                dbTask.setType(DLTaskType.SUCCESS.ordinal());
+                dbClient.taskUpdate(dbTask);
+            }
+
         } else {
             //
             new DLTaskInfo(client, task).execute(new DLTaskInfo.NetCallBack() {
@@ -58,7 +70,7 @@ public final class DLManage {
 
                 @Override
                 public void onFail() {
-                    task.getBuilder().setTaskType(DLTask.Builder.DTaskType.FAIL);
+                    task.getBuilder().setTaskType(DLTaskType.FAIL);
                     CZController.uiHelp.toast("下载失败！");
                 }
             });
@@ -66,10 +78,10 @@ public final class DLManage {
     }
 
     /**
-     *
+     * 计算断点
      */
     private void calcDCall() {
-        Log.e("liqiong",this.task.getBuilder().getName()+"calc____Call________________calc____Call________________calc____Call________________calc____Call________________");
+        Log.e("liqiong",this.task.getBuilder().getName());
         this.task.getBuilder().setCurrentLength(0);
         long length = this.task.getBuilder().getLength();
         long average = length / getThreadCount();
@@ -90,9 +102,9 @@ public final class DLManage {
 
             dbClient.taskPointSave(dbTaskPoint);
 
-            dispatcher.enqueue(new DLDownload(client, task, dbTaskPoint, startPoint, endPoint));
-        }
+        dispatcher.enqueue(new DLDownload(client, task, dbTaskPoint, startPoint, endPoint));
     }
+}
 
     public int getThreadCount() {
         if (threadCount == 0)

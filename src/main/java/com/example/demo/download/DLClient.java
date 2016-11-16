@@ -1,8 +1,7 @@
-package com.example.demo.download;
+package com.chazuo.college.enterprise.download;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 
 /**
  * Created by LiQiong on 2016/10/28.
@@ -10,7 +9,7 @@ import java.net.MalformedURLException;
 
 public abstract class DLClient {
 
-    protected final String rangeName="Range";
+    protected static final String RANGE_NAME ="Range";
 
     public abstract long bodyLength(String netUrl) throws IOException;
     public abstract InputStream bodyInputStream(String netUrl, long startPoint, long endPoint)throws IOException;

@@ -1,10 +1,8 @@
-package com.example.demo.download;
+package com.chazuo.college.enterprise.download;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -31,7 +29,7 @@ public final class HttpUrlClient extends DLClient {
         URL url = new URL(netUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(5000);
-        conn.setRequestProperty(rangeName, rangeValue(startPoint, endPoint));
+        conn.setRequestProperty(RANGE_NAME, rangeValue(startPoint, endPoint));
         int code = conn.getResponseCode();
         if (code == 206)
             return conn.getInputStream();
