@@ -26,6 +26,7 @@ public class DLTask {
         private DLTaskType taskType = DLTaskType.WAIT;
         private long length;
         private long currentLength;
+        private int startPoint;
         private DLDispatcher dispatcher;
         private Object tag;
 
@@ -33,7 +34,7 @@ public class DLTask {
             if (Environment.getExternalStorageDirectory() != null) {
                 //默认的下载目录
                 this.localUrl = CZKernel.getInstance().getContext()
-                        .getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS+"/media")
+                        .getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS + "/media")
                         .getPath();
             }
         }
@@ -44,7 +45,7 @@ public class DLTask {
         }
 
         public Builder name(String name) {
-            this.name = name;
+            this.name =name;
             return this;
         }
 
@@ -73,7 +74,7 @@ public class DLTask {
             return length;
         }
 
-        public synchronized long getCurrentLength() {
+        public long getCurrentLength() {
             return currentLength;
         }
 
@@ -81,7 +82,7 @@ public class DLTask {
             this.length = length;
         }
 
-        public synchronized void setCurrentLength(long currentLength) {
+        public void setCurrentLength(long currentLength) {
             this.currentLength = currentLength;
         }
 
@@ -93,14 +94,6 @@ public class DLTask {
             this.taskType = taskType;
         }
 
-        public DLDispatcher getDispatcher() {
-            return dispatcher;
-        }
-
-        public void setDispatcher(DLDispatcher dispatcher) {
-            this.dispatcher = dispatcher;
-        }
-
         public Object getTag() {
             return tag;
         }
@@ -109,5 +102,20 @@ public class DLTask {
             this.tag = tag;
         }
 
+        public int getStartPoint() {
+            return startPoint;
+        }
+
+        public void setStartPoint(int startPoint) {
+            this.startPoint = startPoint;
+        }
+
+        public DLDispatcher getDispatcher() {
+            return dispatcher;
+        }
+
+        public void setDispatcher(DLDispatcher dispatcher) {
+            this.dispatcher = dispatcher;
+        }
     }
 }

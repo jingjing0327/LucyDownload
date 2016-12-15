@@ -20,14 +20,5 @@ public abstract class DBClient {
     public abstract List<DBTask> taskFind(String where, String[] whereArgs);
 
     //
-    public abstract void taskPointSave(DBTaskPoint point);
-
-    //
-    public abstract void taskPointUpdate(DBTaskPoint point);
-
-    //
-    public abstract List<DBTaskPoint> taskPointFind(String where, String[] whereArgs);
-    //
-    public abstract void taskPointDelete(String where, String[] whereArgs);
-
+    public abstract void taskUpdate(String name, String netUrl, int type);
 }

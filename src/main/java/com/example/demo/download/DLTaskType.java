@@ -9,5 +9,31 @@ public enum DLTaskType {
     SUCCESS,
     DOWNLOADING,
     WAIT,
-    PAUSE
+    PAUSE;
+
+    public static String convertTaskType(DLTaskType type) {
+        if (type == null)
+            return "暂停";
+
+        String tempStatus = "";
+        switch (type) {
+            case FAIL:
+                tempStatus = "失败";
+                break;
+            case SUCCESS:
+                tempStatus = "成功";
+                break;
+            case DOWNLOADING:
+                tempStatus = "下载中";
+                break;
+            case WAIT:
+                tempStatus = "等待中";
+                break;
+            case PAUSE:
+                tempStatus = "暂停";
+                break;
+        }
+        return tempStatus;
+    }
 }
+

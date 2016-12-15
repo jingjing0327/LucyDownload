@@ -1,5 +1,7 @@
 package com.chazuo.college.enterprise.download;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
@@ -22,11 +24,9 @@ public class DLTaskInfo {
             public void run() {
                 try {
                     long length = client.bodyLength(task.getBuilder().getNetUrl());
+                    Log.e("liqiongqiong","file net length->"+length);
                     if(length>0){
                         task.getBuilder().setLength(length);
-                        RandomAccessFile file = new RandomAccessFile(task.getBuilder().getLocalUrl() + "/" + task.getBuilder().getName(), "rwd");
-                        file.setLength(length);
-                        file.close();
                         callBack.onSuccess();
                     }else
                         callBack.onFail();

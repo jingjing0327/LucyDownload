@@ -7,6 +7,7 @@ package com.chazuo.college.enterprise.download;
 public class DBTask {
     private String name;
     private String netUrl;
+    private int length;
     //type :
     // 0->fail,
     // 1->success,
@@ -19,10 +20,11 @@ public class DBTask {
 
     }
 
-    public DBTask(String name, String netUrl, int type) {
+    public DBTask(String name, String netUrl, int type, int length) {
         this.name = name;
         this.netUrl = netUrl;
         this.type = type;
+        this.length = length;
     }
 
     public String getName() {
@@ -49,11 +51,20 @@ public class DBTask {
         this.type = type;
     }
 
+    public int getLength() {
+        return length;
+    }
+
+    public void setLength(int length) {
+        this.length = length;
+    }
+
     @Override
     public String toString() {
         return "DBTask{" +
                 "name='" + name + '\'' +
                 ", netUrl='" + netUrl + '\'' +
+                ", length=" + length +
                 ", type=" + type +
                 '}';
     }

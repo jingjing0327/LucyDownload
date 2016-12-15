@@ -2,6 +2,7 @@ package com.chazuo.college.enterprise.download;
 
 import android.text.TextUtils;
 
+import com.chazuo.czlib.db.DatabaseUtil;
 import com.chazuo.czlib.module.impl.CZController;
 
 import org.w3c.dom.Text;
@@ -12,16 +13,16 @@ import java.util.List;
  * Created by LiQiong on 2016/10/31.
  */
 
-public class DBClientImpl extends DBClient {
+class DBClientImpl extends DBClient {
 
     @Override
     public void taskSaveNewOnly(DBTask task) {
         if (!TextUtils.isEmpty(task.getName()) && !TextUtils.isEmpty(task.getNetUrl())) {
             List<DBTask> findTask = taskFind("name=? and netUrl=?", new String[]{task.getName(), task.getNetUrl()});
-            if (findTask.size() == 0 || findTask == null) {
+            if (findTask.size() == 0) {
                 CZController.dbHelp.save(task);
-            }else if(findTask.size()>=1){
-                taskUpdate(task);
+            } else if (findTask.size() >= 1) {
+                taskUpdate(task.getName(),task.getNetUrl(),task.getType());
             }
         } else {
             CZController.uiHelp.toast("save fail!");
@@ -36,9 +37,11 @@ public class DBClientImpl extends DBClient {
 
     @Override
     public void taskDelete(DBTask task) {
-        String where = "name=? and netUrl=? ";
-        String[] whereArgs = {task.getName(), task.getNetUrl()};
-        CZController.dbHelp.delete(DBTask.class, where, whereArgs);
+//        String where = "name=? and netUrl=? ";
+//        String[] whereArgs = {task.getName(), task.getNetUrl()};
+        String where = "netUrl=? ";
+        String[] whereArgs = {task.getNetUrl()};
+        int row=CZController.dbHelp.delete(DBTask.class, where, whereArgs);
     }
 
     @Override
@@ -48,25 +51,17 @@ public class DBClientImpl extends DBClient {
     }
 
     @Override
-    public List<DBTaskPoint> taskPointFind(String where, String[] whereArgs) {
-        List<DBTaskPoint> findTaskPoint = CZController.dbHelp.find(DBTaskPoint.class, where, whereArgs);
-        return findTaskPoint;
-    }
-
-
-    @Override
-    public void taskPointSave(DBTaskPoint point) {
-        CZController.dbHelp.save(point);
-    }
-
-    @Override
-    public void taskPointUpdate(DBTaskPoint point) {
-        String[] whereArgs = {point.getName()};
-        CZController.dbHelp.update(point, "name=?", whereArgs);
-    }
-
-    @Override
-    public void taskPointDelete(String where, String[] whereArgs) {
-        CZController.dbHelp.delete(DBTaskPoint.class, where, whereArgs);
+    public void taskUpdate(String name, String netUrl, int type) {
+        String tableName = DatabaseUtil.getTableName(DBTask.class);
+        String sql = "update "
+                + tableName
+                + " set type="
+                + type
+                + " where name ='"
+                + name
+                + "' and netUrl='"
+                + netUrl
+                +"'";
+        CZController.dbHelp.update(sql);
     }
 }

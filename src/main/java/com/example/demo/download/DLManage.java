@@ -4,25 +4,24 @@ import android.util.Log;
 
 import com.chazuo.czlib.module.impl.CZController;
 
+import java.io.File;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by LiQiong on 2016/10/26.
  */
 
 public final class DLManage {
-    protected int threadCount;
     protected DLTask task;
-    private DLDispatcher dispatcher;
     private DLClient client;
     private DBClient dbClient;
+    private DLDispatcher dispatcher;
 
-    private List<DBTaskPoint> dbTaskPoints;
 
     public DLManage(DLTask task) {
         this.task = task;
-        dispatcher = new DLDispatcher();
+        this.dispatcher = new DLDispatcher();
+        task.getBuilder().setDispatcher(dispatcher);
         dbClient = DLQueue.getInstance().getDbClient();
     }
 
@@ -30,42 +29,25 @@ public final class DLManage {
      *
      */
     public void execute() {
-        //查询当前任务有没有断点
-        String[] selectionArgs = new String[]{task.getBuilder().getNetUrl(), task.getBuilder().getName() + "%"};
-        dbTaskPoints=dbClient.taskPointFind("netUrl=? and name like ?", selectionArgs);
-        //初始化线程池下载器
-        dispatcher.setCorePoolSize(getThreadCount()).build();
-        task.getBuilder().setDispatcher(dispatcher);
+        File file = new File(task.getBuilder().getLocalUrl() + "/" + task.getBuilder().getName());
+        List<DBTask> dbTasksPoint = dbClient.taskFind("name=? and netUrl=?", new String[]{task.getBuilder().getName(), task.getBuilder().getNetUrl()});
 
-        if (dbTaskPoints != null && dbTaskPoints.size() != 0) {
-            task.getBuilder().setCurrentLength(0);
-            for (DBTaskPoint dbTaskPoint : dbTaskPoints) {
-                //需要计算一下上次下载的进度
-                task.getBuilder().setCurrentLength(task.getBuilder().getCurrentLength() + (dbTaskPoint.getStartPoint() - dbTaskPoint.getFirstStartPoint()));
-                task.getBuilder().setLength(dbTaskPoint.getLength());
-                if (dbTaskPoint.getStartPoint() < dbTaskPoint.getEndPoint())
-                    dispatcher.enqueue(new DLDownload(client, task, dbTaskPoint, dbTaskPoint.getStartPoint(), dbTaskPoint.getEndPoint()));
-            }
-
-            //如果字段相等.,一般并不會走到走到這個代碼。
-            if (task.getBuilder().getLength() == task.getBuilder().getCurrentLength()) {
+        if (file.exists() && dbTasksPoint.size() > 0 && dbTasksPoint.get(0).getLength() > 0) {
+            task.getBuilder().setCurrentLength(file.length());
+            task.getBuilder().setLength(dbTasksPoint.get(0).getLength());
+            if(file.length()==dbTasksPoint.get(0).getLength()){
                 task.getBuilder().setTaskType(DLTaskType.SUCCESS);
-                String[] whereArgs = new String[]{task.getBuilder().getNetUrl(), task.getBuilder().getName() + "%"};
-                dbClient.taskPointDelete("netUrl=? and name like ?", whereArgs);
-
-                DBTask dbTask = new DBTask();
-                dbTask.setName(task.getBuilder().getName());
-                dbTask.setNetUrl(task.getBuilder().getNetUrl());
-                dbTask.setType(DLTaskType.SUCCESS.ordinal());
-                dbClient.taskUpdate(dbTask);
+                return;
             }
-
+            task.getBuilder().setStartPoint((int) file.length());
+            task.getBuilder().setLength(dbTasksPoint.get(0).getLength());
+            dispatcher.exec(new DLDownload(client, task));
         } else {
             //
             new DLTaskInfo(client, task).execute(new DLTaskInfo.NetCallBack() {
                 @Override
                 public void onSuccess() {
-                    calcDCall();
+                    singleDCall();
                 }
 
                 @Override
@@ -77,44 +59,17 @@ public final class DLManage {
         }
     }
 
-    /**
-     * 计算断点
-     */
-    private void calcDCall() {
-        Log.e("liqiong",this.task.getBuilder().getName());
-        this.task.getBuilder().setCurrentLength(0);
-        long length = this.task.getBuilder().getLength();
-        long average = length / getThreadCount();
-
-        for (int i = 0; i < getThreadCount(); i++) {
-            long startPoint = i * average;
-            long endPoint = (i + 1) * average;
-            if (i == (getThreadCount() - 1)) endPoint = length;
-            if (startPoint != 0) ++startPoint;
-
-            DBTaskPoint dbTaskPoint = new DBTaskPoint();
-            dbTaskPoint.setName(task.getBuilder().getName() + UUID.randomUUID().toString());
-            dbTaskPoint.setNetUrl(task.getBuilder().getNetUrl());
-            dbTaskPoint.setLength(length);
-            dbTaskPoint.setStartPoint(startPoint);
-            dbTaskPoint.setEndPoint(endPoint);
-            dbTaskPoint.setFirstStartPoint(startPoint);
-
-            dbClient.taskPointSave(dbTaskPoint);
-
-        dispatcher.enqueue(new DLDownload(client, task, dbTaskPoint, startPoint, endPoint));
-    }
-}
-
-    public int getThreadCount() {
-        if (threadCount == 0)
-            threadCount = 1;
-        return threadCount;
-    }
-
-    public DLManage setThreadCount(int threadCount) {
-        this.threadCount = threadCount;
-        return this;
+    private void singleDCall() {
+        dbClient.taskUpdate(new DBTask(
+                task.getBuilder().getName(),
+                task.getBuilder().getNetUrl(),
+                DLTaskType.DOWNLOADING.ordinal(),
+                (int) task.getBuilder().getLength()));
+        List<DBTask> xxx = CZController.dbHelp.find(DBTask.class, "name=? and netUrl=?", new String[]{task.getBuilder().getName(), task.getBuilder().getNetUrl()});
+        Log.e("liqiong", xxx.toString());
+        task.getBuilder().setCurrentLength(0);
+        task.getBuilder().setStartPoint(0);
+        dispatcher.exec(new DLDownload(client, task));
     }
 
     public DLManage client(DLClient client) {

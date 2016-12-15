@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.chazuo.czlib.module.impl.CZController;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +27,7 @@ public final class DLQueue {
     private DLQueue() {
         tasks = new LinkedList<>();
         dbClient = new DBClientImpl();
+        initUnfinishedTask();
         execute();
     }
 
@@ -39,6 +41,7 @@ public final class DLQueue {
     public List<DLTask> tasks() {
         return tasks;
     }
+
 
     /**
      * 放入队列的task，如果名字和下载地址不一样，才能放到队列中
@@ -61,18 +64,44 @@ public final class DLQueue {
             if (task.getBuilder().getTaskType() == null)
                 task.getBuilder().setTaskType(DLTaskType.WAIT);
             tasks.add(task);
-            dbClient.taskSaveNewOnly(new DBTask(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.WAIT.ordinal()));
-            Log.e("liqiong",task.getBuilder().getName() +"放到队列中了。");
+            dbClient.taskSaveNewOnly(new DBTask(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.WAIT.ordinal(), -1));
+            Log.e("liqiong", task.getBuilder().getName() + "放到队列中了。");
         } else {
             Log.e("liqiong", "task name->" + task.getBuilder().getName() + "--->队列重复，不放到下载队列中！");
         }
         return this;
     }
 
-    public DLQueue remove(DLTask task) {
+    /**
+     * @param task
+     */
+    public void delete(DLTask task) {
+        List<DBTask> xxx= CZController.dbHelp.findAll(DBTask.class);
+
+        pause(task);
+        //删除DBTask
+        dbClient.taskDelete(new DBTask(task.getBuilder().getName(), task.getBuilder().getNetUrl(), 88, 0));
+        //删除 文件
+        File tempFile = new File(task.getBuilder().getLocalUrl() + "/" + task.getBuilder().getName());
+        if (tempFile.exists())
+            tempFile.delete();
+        //删除 courseItem
+
+        List<DBTask> ooo= CZController.dbHelp.findAll(DBTask.class);
+    }
+
+    /**
+     *
+     */
+    public void deleteAll() {
+        for (DLTask task : tasks)
+            delete(task);
+    }
+
+    private DLQueue remove(DLTask task) {
         tasks.remove(task);
         //注：这个 88 可以随便填写，后台不使用
-        dbClient.taskDelete(new DBTask(task.getBuilder().getName(), task.getBuilder().getNetUrl(), 88));
+        dbClient.taskDelete(new DBTask(task.getBuilder().getName(), task.getBuilder().getNetUrl(), 88, 0));
         return this;
     }
 
@@ -135,9 +164,21 @@ public final class DLQueue {
     public void pause(DLTask task) {
         if (task != null) {
             task.getBuilder().setTaskType(DLTaskType.PAUSE);
-            dbClient.taskUpdate(new DBTask(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.PAUSE.ordinal()));
-            if(task!=currentTask)
-                tasks.remove(task);
+            dbClient.taskUpdate(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.PAUSE.ordinal());
+            tasks.remove(task);
+            if (task.getBuilder().getDispatcher() != null)
+                task.getBuilder().getDispatcher().shutdown();
+        } else {
+            CZController.uiHelp.toast("任务不存在！");
+        }
+    }
+
+    private void pauseNotRemove(DLTask task) {
+        if (task != null) {
+            task.getBuilder().setTaskType(DLTaskType.PAUSE);
+            dbClient.taskUpdate(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.PAUSE.ordinal());
+            if (task.getBuilder().getDispatcher() != null)
+                task.getBuilder().getDispatcher().shutdown();
         } else {
             CZController.uiHelp.toast("任务不存在！");
         }
@@ -147,17 +188,19 @@ public final class DLQueue {
      * 暂停所有
      */
     public void pauseAll() {
-        if (tasks != null)
-            for (DLTask task : tasks)
-                pause(task);
+        for (DLTask task : tasks())
+            pauseNotRemove(task);
+        tasks.clear();
     }
 
-    public void startAll() {
-        if (tasks != null)
-            for (DLTask task : tasks) {
+    public void startAll(List<DLTask> startAllTask) {
+        for (DLTask task : startAllTask) {
+            if (task != currentTask) {
                 task.getBuilder().setTaskType(DLTaskType.WAIT);
-
+                dbClient.taskUpdate(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.WAIT.ordinal());
             }
+            enqueue(task);
+        }
     }
 
     public DBClient getDbClient() {
@@ -171,32 +214,19 @@ public final class DLQueue {
         CZController.uiHelp.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.e("liqiong-execute-size",tasks.size()+"");
                 if (tasks.size() >= 1) {
                     DLTask task = tasks.get(0);
-                    Log.e("liqiong", task.getBuilder().getName() + "---" +
-                            task.getBuilder().getCurrentLength() + "---" +
-                            task.getBuilder().getLength());
-                    Log.e("liqiong", task.getBuilder().getTaskType() + "");
                     if (task != null && task != currentTask) {
-
                         currentTask = task;
-
-                        new DLManage(task)
-                                .client(HttpUrlClient.create())
-                                .setThreadCount(2)
-                                .execute();
 
                         //找个地方稍微有点垃圾，待修改
                         task.getBuilder().setTaskType(DLTaskType.DOWNLOADING);
-                        //
 
-                        DBTask dbTask = new DBTask();
-                        dbTask.setName(task.getBuilder().getName());
-                        dbTask.setNetUrl(task.getBuilder().getNetUrl());
-                        dbTask.setType(DLTaskType.DOWNLOADING.ordinal());
+                        dbClient.taskUpdate(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.DOWNLOADING.ordinal());
 
-                        dbClient.taskUpdate(dbTask);
+                        new DLManage(task)
+                                .client(HttpUrlClient.create())
+                                .execute();
                         //
                     }
                     if (task.getBuilder().getTaskType() == DLTaskType.SUCCESS
@@ -208,21 +238,15 @@ public final class DLQueue {
                         task.getBuilder().getDispatcher().shutdown();
                         tasks.remove(task);
 
-                        DBTask dbTask = new DBTask();
-                        dbTask.setName(task.getBuilder().getName());
-                        dbTask.setNetUrl(task.getBuilder().getNetUrl());
                         if (task.getBuilder().getTaskType() == DLTaskType.SUCCESS) {
                             //删除成功的dbTask
-                            dbTask.setType(DLTaskType.SUCCESS.ordinal());
-                            dbClient.taskDelete(dbTask);
+                            dbClient.taskUpdate(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.SUCCESS.ordinal());
                         }
                         if (task.getBuilder().getTaskType() == DLTaskType.FAIL) {
-                            dbTask.setType(DLTaskType.FAIL.ordinal());
-                            dbClient.taskUpdate(dbTask);
+                            dbClient.taskUpdate(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.FAIL.ordinal());
                         }
                         if (task.getBuilder().getTaskType() == DLTaskType.PAUSE) {
-                            dbTask.setType(DLTaskType.PAUSE.ordinal());
-                            dbClient.taskUpdate(dbTask);
+                            dbClient.taskUpdate(task.getBuilder().getName(), task.getBuilder().getNetUrl(), DLTaskType.PAUSE.ordinal());
                         }
                     }
                 } else {
@@ -237,9 +261,39 @@ public final class DLQueue {
      * 获取未完成的任务
      */
     public List<DBTask> getUnfinishedTask() {
-        List<DBTask> dbTasks = dbClient.taskFind("type!=?", new String[]{DLTaskType.SUCCESS.ordinal()+""});
-        Log.e("getUnfinishedTask", dbTasks.toString());
-//        CZController.uiHelp.toast(dbTasks.toString());
+        List<DBTask> dbTasks = dbClient.taskFind("type!=?", new String[]{DLTaskType.SUCCESS.ordinal() + ""});
         return dbTasks;
+    }
+
+    /**
+     *
+     */
+    private void initUnfinishedTask() {
+        List<DBTask> dbTasks = getUnfinishedTask();
+        for (DBTask dbTask : dbTasks) {
+            if (TextUtils.isEmpty(dbTask.getName()) || TextUtils.isEmpty(dbTask.getNetUrl()))
+                continue;
+
+            DLTask task = new DLTask.Builder()
+                    .netUrl(dbTask.getNetUrl())
+                    .name(dbTask.getName())
+                    .build();
+
+            task.getBuilder().setTaskType(DBConvertEnum(dbTask.getType()));
+
+            if (task.getBuilder().getTaskType() == DLTaskType.DOWNLOADING ||
+                    task.getBuilder().getTaskType() == DLTaskType.WAIT)
+                enqueue(task);
+        }
+    }
+
+    private DLTaskType DBConvertEnum(int type) {
+        DLTaskType[] taskTypes = DLTaskType.values();
+        for (DLTaskType taskType : taskTypes) {
+            if (type == taskType.ordinal()) {
+                return taskType;
+            }
+        }
+        return null;
     }
 }

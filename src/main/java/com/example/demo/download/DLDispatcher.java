@@ -2,60 +2,23 @@ package com.chazuo.college.enterprise.download;
 
 import android.util.Log;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 /**
- * Created by LiQiong on 2016/10/27.
+ * Created by LiQiong on 2016/12/13 14:59
  */
 
 public final class DLDispatcher {
-    private int corePoolSize;
-    private ExecutorService executorService;
-    private List<DLCall> calls;
+    private final String LOG_NAME = this.getClass().getCanonicalName();
+    private DLCall call;
 
-    public DLDispatcher() {
-        calls = new ArrayList<>();
+    public void exec(DLCall call) {
+        this.call = call;
+        new Thread(call).start();
     }
 
-    public DLDispatcher build() {
-        if (executorService == null)
-            executorService = Executors.newFixedThreadPool(getCorePoolSize());
-        return this;
-    }
-
-    public DLDispatcher enqueue(DLCall download) {
-        executorService.execute(download);
-        calls.add(download);
-        return this;
-    }
-
-    public DLDispatcher setCorePoolSize(int corePoolSize) {
-        this.corePoolSize = corePoolSize;
-        return this;
-    }
-
-    public DLDispatcher shutdown() {
-        if (executorService != null) {
-            for (DLCall call : calls) {
-                Log.e("liqiongqiong",call.name+"---"+call.toString());
-                call.isStop = true;
-            }
-            Log.e("liqiong", "shutdownNow!!!!!!!!!!!!!!");
-//            executorService.shutdownNow();
-
-        } else {
-            Log.e("liqiong", "executorService.isTerminated()-->>" + executorService.isTerminated());
-            Log.e("liqiong", "executorService.isShutdown()-->>" + executorService.isShutdown());
+    public void shutdown() {
+        if (this.call != null) {
+            this.call.isStop = true;
+            Log.e(LOG_NAME, call.name + "is shutdown!");
         }
-        return this;
-    }
-
-    public int getCorePoolSize() {
-        if (corePoolSize == 0)
-            ++corePoolSize;
-        return corePoolSize;
     }
 }
