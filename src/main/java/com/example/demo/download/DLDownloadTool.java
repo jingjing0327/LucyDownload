@@ -1,9 +1,9 @@
 package com.chazuo.college.enterprise.download;
 
 import android.os.Environment;
-import android.util.Log;
 
 import com.chazuo.college.enterprise.ui.download.ex.entity.CourseItem;
+import com.chazuo.college.enterprise.util.NetUtil;
 import com.chazuo.czlib.module.impl.CZController;
 import com.chazuo.czlib.module.impl.CZKernel;
 
@@ -15,6 +15,20 @@ import java.util.List;
  */
 
 public class DLDownloadTool {
+
+    private static boolean isWifi;
+
+    /**
+     * 如果再手机网络下，切换到wifi下，下载继续
+     * 如果是wifi下，切换到手机网络下，下载全部暂停,再次点击全部下载，便可再手机网络下下载file.
+     */
+    private static void handlerDownloadState() {
+        isWifi = NetUtil.isWifi();
+        if (!isWifi) {
+            DLQueue.getInstance().pauseAll();
+        }
+    }
+
     /**
      *
      */
@@ -53,6 +67,17 @@ public class DLDownloadTool {
     }
 
     /**
+     * @param path
+     * @return
+     */
+    public static boolean isLocalMedia(String path) {
+        if (path.contains(Environment.getExternalStorageDirectory().getPath())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 檢查是否又下載
      *
      * @param id
@@ -67,8 +92,6 @@ public class DLDownloadTool {
     }
 
     public static String replaceSeparatorByName(String name) {
-
         return name.replace("/", "");
-//        return name;
     }
 }

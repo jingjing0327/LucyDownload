@@ -3,6 +3,7 @@ package com.chazuo.college.enterprise.download;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.chazuo.college.enterprise.util.NetUtil;
 import com.chazuo.czlib.module.impl.CZController;
 
 import java.io.File;
@@ -76,7 +77,7 @@ public final class DLQueue {
      * @param task
      */
     public void delete(DLTask task) {
-        List<DBTask> xxx= CZController.dbHelp.findAll(DBTask.class);
+        List<DBTask> xxx = CZController.dbHelp.findAll(DBTask.class);
 
         pause(task);
         //删除DBTask
@@ -87,7 +88,7 @@ public final class DLQueue {
             tempFile.delete();
         //删除 courseItem
 
-        List<DBTask> ooo= CZController.dbHelp.findAll(DBTask.class);
+        List<DBTask> ooo = CZController.dbHelp.findAll(DBTask.class);
     }
 
     /**
@@ -210,6 +211,8 @@ public final class DLQueue {
     /**
      *
      */
+    private boolean isWifi;
+
     private void execute() {
         CZController.uiHelp.postDelayed(new Runnable() {
             @Override
@@ -217,6 +220,15 @@ public final class DLQueue {
                 if (tasks.size() >= 1) {
                     DLTask task = tasks.get(0);
                     if (task != null && task != currentTask) {
+                        if (isWifi) {
+                            if (!NetUtil.isWifi()) {
+                                pauseAll();
+                                CZController.uiHelp.toast("当前网络为手机网络，暂停全部下载！");
+                            }
+                        }
+
+                        isWifi = NetUtil.isWifi();
+
                         currentTask = task;
 
                         //找个地方稍微有点垃圾，待修改
@@ -227,6 +239,7 @@ public final class DLQueue {
                         new DLManage(task)
                                 .client(HttpUrlClient.create())
                                 .execute();
+
                         //
                     }
                     if (task.getBuilder().getTaskType() == DLTaskType.SUCCESS

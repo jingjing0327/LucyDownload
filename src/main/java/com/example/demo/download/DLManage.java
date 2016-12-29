@@ -41,6 +41,10 @@ public final class DLManage {
             }
             task.getBuilder().setStartPoint((int) file.length());
             task.getBuilder().setLength(dbTasksPoint.get(0).getLength());
+
+            Log.e("liqiong","StartPoint===>>>"+file.length());
+            Log.e("liqiong","StartPoint===>>>"+task.getBuilder().getStartPoint());
+
             dispatcher.exec(new DLDownload(client, task));
         } else {
             //
